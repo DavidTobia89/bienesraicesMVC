@@ -13,6 +13,11 @@ class Router {
         $this->rutasPOST[$url] = $fn;
     }
     public function comprobarRutas() {
+        session_start();
+        $auth = $_SESSION ['login'] ?? null;
+
+        $rutas_protegidas = ['/admin, /propiedades/crear, /propiedades/actualizar, /propiedades/eliminar, /vendedores/crear, /vendedores/actualizar, /vendedores/eliminar'];
+
         $urlActual = $_SERVER['PATH_INFO'] ?? '/';
         $metodo = $_SERVER['REQUEST_METHOD'];
  
@@ -23,7 +28,9 @@ class Router {
         }else {
             $fn = $this->rutasPOST[$urlActual] ?? null;
         }
- 
+        if (in_array($urlActual, $rutas_protegidas) && !$auth){
+            header('Location: /');
+        }
         if ( $fn ) {
             // Si la URL si existe y tiene una función asociada entonces ejecuta la función
             call_user_func( $fn, $this );   // Permite ejecutar una función 
